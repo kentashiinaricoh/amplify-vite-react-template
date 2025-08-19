@@ -1,4 +1,5 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { createStory } from "../functions/create-story/resources";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -11,6 +12,15 @@ const schema = a.schema({
     .model({
       content: a.string(),
       }).authorization(allow => [allow.owner()]),
+    
+  createStory: a
+    .query()
+    .arguments({
+      name: a.string(),
+    })
+    .returns(a.string())
+    .authorization(allow => [allow.guest()])
+    .handler(a.handler.function(createStory)),
 });
 
 export type Schema = ClientSchema<typeof schema>;
