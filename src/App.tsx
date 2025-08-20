@@ -7,8 +7,9 @@ const region = "us-west-2";
 
 // public フォルダ直下の画像キー一覧
 const imageKeys = [
-  "public/yukidaruma_01.jpg",
-  "public/yukidaruma_02.jpg",
+  // "public/yukidaruma_01.jpg",
+  // "public/yukidaruma_02.jpg",
+  "public/test.png",
 ];
 
 type UserProfile = {
