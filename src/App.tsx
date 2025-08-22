@@ -1,8 +1,24 @@
 import { useEffect, useState } from "react";
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import { StorageImage } from '@aws-amplify/ui-react-storage';
+import test3 from "./assets/test3.png";
+import test4 from "./assets/test4.png";
+// import { uploadData } from 'aws-amplify/storage';
+
+// // 起動時にasset内にあるファイルをアップロード→手動でS3にアップするのと同じなので変わらない
+// try {
+//   const result = await uploadData({
+//     path: "./assets/test3.png",
+//     // Alternatively, path: ({identityId}) => `album/${identityId}/1.jpg`
+//     data: file,
+//   }).result;
+//   console.log('Succeeded: ', result);
+// } catch (error) {
+//   console.log('Error : ', error);
+// }
 
 // --- S3 バケット情報 ---
-const bucketName = "amplify-d2oahx73axow03-ma-presetimagesbucketd1b9e5-ugk0jylijtyp-bucket-name";
+const bucketName = "amplify-d2oahx73axow03-ma-presetimagesbucketd1b9e5-ugk0jylijtyp";
 const region = "us-west-2";
 
 // public フォルダ直下の画像キー一覧
@@ -11,6 +27,32 @@ const imageKeys = [
   // "public/yukidaruma_02.jpg",
   "public/test.png",
 ];
+
+const imageKee = [
+  {
+    "key": "public/yukidaruma_01.jpg",
+    "alt": "yukidaruma_01.jpg"
+  },
+  {
+    "key": "public/yukidaruma_02.jpg",
+    "alt": "yukidaruma_02.jpg"
+  },
+  {
+    "key": "public/test.png",
+    "alt": "test.png"
+  }
+]
+
+const imageKee1 = [
+  {
+    "key": test3,
+    "alt": "test3.png"
+  },
+  {
+    "key": test4,
+    "alt": "test4.png"
+  }
+]
 
 type UserProfile = {
   name: string;
@@ -27,15 +69,15 @@ function App() {
   const [age, setAge] = useState<number | "">("");
   const [interests, setInterests] = useState("");
 
-  // --- 画像 URL を組み立て ---
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  useEffect(() => {
-    if (!user) return;
-    const urls = imageKeys.map(
-      (key) => `https://${bucketName}.s3.${region}.amazonaws.com/${key}`
-    );
-    setImageUrls(urls);
-  }, [user]);
+  // // --- 画像 URL を組み立て ---
+  // const [imageUrls, setImageUrls] = useState<string[]>([]);
+  // useEffect(() => {
+  //   if (!user) return;
+  //   const urls = imageKeys.map(
+  //     (key) => `https://${bucketName}.s3.${region}.amazonaws.com/${key}`
+  //   );
+  //   setImageUrls(urls);
+  // }, [user]);
 
   // --- 選択画像管理 ---
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -131,22 +173,74 @@ function App() {
 
       <h2>候補画像一覧 (S3 public/)</h2>
       <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-        {imageUrls.length > 0 ? (
-          imageUrls.map((url, idx) => {
-            const isSelected = selectedImages.includes(url);
+        {imageKee1.length > 0 ? (
+          imageKee1.map((img, idx) => {
+            // const url = `https://${bucketName}.s3.${region}.amazonaws.com/${img.key}`;
+            const isSelected = selectedImages.includes(img.key);
             return (
               <img
                 key={idx}
-                src={url}
-                alt={`image-${idx}`}
-                width={150}
+                alt={img.alt}
+                src={img.key}
                 style={{
+                  width: 150,
                   borderRadius: "8px",
                   boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                   cursor: "pointer",
                   border: isSelected ? "4px solid blue" : "2px solid transparent",
                 }}
-                onClick={() => toggleSelect(url)}
+                onClick={() => toggleSelect(img.key)}
+              />
+            );
+          })
+        ) : (
+          <p>画像がありません</p>
+        )}
+        
+        <img
+          src={test3}
+          alt="test3"
+          style={{
+            width: 150,
+            borderRadius: "8px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            cursor: "pointer",
+            border: "2px solid transparent"
+          }}
+          onClick={() => alert("画像クリックされました！")}
+        />
+        
+        {/* <StorageImage
+          // key={idx}
+          alt="yukidaruma_01" // alt={img.alt}
+          path="yukidaruma_01.jpg" // path={img.key}
+          style={{
+            width: 150,
+            borderRadius: "8px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            cursor: "pointer",
+            // border: isSelected ? "4px solid blue" : "2px solid transparent",
+          }}
+        // onClick={() => toggleSelect(img.key)}
+        /> */}
+        
+        {imageKee.length > 0 ? (
+          imageKee.map((img, idx) => {
+            // const url = `https://${bucketName}.s3.${region}.amazonaws.com/${img.key}`;
+            const isSelected = selectedImages.includes(img.key);
+            return (
+              <StorageImage
+                key={idx}
+                alt="yukidaruma_01" // alt={img.alt}
+                path="public/yukidaruma_01.jpg" // path={img.key}
+                style={{
+                  width: 150,
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                  cursor: "pointer",
+                  border: isSelected ? "4px solid blue" : "2px solid transparent",
+                }}
+                onClick={() => toggleSelect(img.key)}
               />
             );
           })
@@ -161,7 +255,7 @@ function App() {
       {/* 開始ボタン */}
       <button
         onClick={handleStart}
-        disabled={selectedImages.length === 0} 
+        disabled={selectedImages.length === 0}
         style={{
           marginTop: "1rem",
           padding: "0.5rem 1rem",
@@ -196,7 +290,7 @@ function PaperShow({ images }: { images: string[] }) {
             src={url}
             alt={`selected-${idx}`}
             style={{
-              width: 200,
+              width: 150,
               height: 200,
               borderRadius: "8px",
               boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
